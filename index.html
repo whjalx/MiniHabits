@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>App de Hábitos</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
+    <title>App de Hábitos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="main.js" defer ></script>
 </head>
 <body>
+    <nav class="nav">
+        <h1>App de Hábitos</h1> 
+         <a href="hw.html" class="btn">Lista de habitos</a>
+        </nav>
     <main>
-      <h1>App de Hábitos</h1>
-
-      </main>
+        
+        
+        <h2>Crear y seguir hábitos diarios</h2>
+        <p>Hábito</p>
+        <input type="text" id="newHabit" placeholder="Nuevo Hábito">
+        <p>Mini Hábito</p>
+        <input type="text" id="MiniHabit" placeholder="Mini Hábito">
+        <div id="miniHabitList" class="listminiHabit"></div>
+        <button onclick="addMiniHabit()" class="btn">Agregar Mini Hábito</button>
+        <button onclick="addHabit()" class="btn">Agregar Hábito</button>
+    </main>
 </body>
 </html>
