@@ -33,7 +33,7 @@ Dado que es una aplicación que se ejecuta en el lado del cliente (frontend), no
 
 1. Clona o descarga el repositorio a tu máquina local:
    ```bash
-   git clone https://github.com/tu-usuario/MiniHabits.git
+   git clone https://github.com/whjalx/MiniHabits.git
    ```
 2. Navega a la carpeta del proyecto.
 3. Abre el archivo `index.html` en cualquier navegador web moderno (Chrome, Firefox, Safari, Edge).
