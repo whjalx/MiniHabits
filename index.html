@@ -1,27 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
-    <title>App de Hábitos</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="main.js" defer ></script>
+    <title>Mini Habits Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js" defer></script>
 </head>
+
 <body>
-    <nav class="nav">
-        <h1>App de Hábitos</h1> 
-         <a href="hw.html" class="btn">Lista de habitos</a>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Mini Habits</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-tab="dashboard"><i class="fa-solid fa-house"></i> Dashboard</li>
+            </ul>
+            <div class="actions-bottom">
+                <button id="exportBtn" class="btn secondary-btn" title="Exportar Datos">
+                    <i class="fa-solid fa-download"></i> Exportar
+                </button>
+                <button id="importBtnTrigger" class="btn secondary-btn" title="Importar Datos">
+                    <i class="fa-solid fa-upload"></i> Importar
+                </button>
+                <input type="file" id="importInput" accept=".json" style="display: none;">
+            </div>
         </nav>
-    <main>
-        
-        
-        <h2>Crear y seguir hábitos diarios</h2>
-        <p>Hábito</p>
-        <input type="text" id="newHabit" placeholder="Nuevo Hábito">
-        <p>Mini Hábito</p>
-        <input type="text" id="MiniHabit" placeholder="Mini Hábito">
-        <div id="miniHabitList" class="listminiHabit"></div>
-        <button onclick="addMiniHabit()" class="btn">Agregar Mini Hábito</button>
-        <button onclick="addHabit()" class="btn">Agregar Hábito</button>
-    </main>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Mi Día</h1>
+                    <p class="subtitle" id="currentDateDisplay">Fecha de hoy</p>
+                </div>
+                <button id="addHabitBtn" class="btn primary-btn">
+                    <i class="fa-solid fa-plus"></i> Nuevo Hábito
+                </button>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Habit cards will be injected here -->
+                <div class="habits-container" id="habitsContainer">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para crear/editar Hábito -->
+    <div id="habitModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nuevo Hábito</h2>
+                <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="habitName">Nombre del Hábito Maestro</label>
+                    <input type="text" id="habitName" placeholder="Ej. Aprender a programar" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Mini Hábitos</label>
+                    <div class="mini-habits-input-container">
+                        <input type="text" id="miniHabitInput" placeholder="Ej. Escribir 10 líneas de código"
+                            autocomplete="off">
+                        <button type="button" id="addMiniHabitBtn" class="btn icon-btn"><i
+                                class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <ul id="modalMiniHabitsList" class="modal-list">
+                        <!-- Dynamic Mini Habits in form -->
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn cancel-btn close-modal">Cancelar</button>
+                <button id="saveHabitBtn" class="btn primary-btn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
 </body>
+
 </html>
