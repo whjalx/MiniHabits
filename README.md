@@ -44,7 +44,7 @@ Dado que es una aplicación que se ejecuta en el lado del cliente (frontend), no
 1. **Exportar Datos**: Haz clic en el botón inferior izquierdo de "**Exportar**". Esto descargará un archivo `minihabits_backup_YYYY-MM-DD.json` en tu carpeta de descargas con todo tu historial intacto.
 2. **Importar Datos**: Haz clic en "**Importar**", selecciona tu archivo `json` previamente guardado, y tu sesión se restaurará instantáneamente como si nunca hubiera pasado el tiempo.
 
-## 📝 Próximas Mejoras (Roadmap)
+## 📝 Próximas Mejoras
 
 *   [ ] Estadísticas semanales y mensuales de progreso.
 *   [ ] Modo edición para modificar hábitos existentes.
