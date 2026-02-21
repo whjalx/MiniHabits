@@ -4,7 +4,11 @@ Mini Habits Suite es una aplicación web moderna, progresiva y sin dependencias 
 
 Cuenta con una estética premium basada en *glassmorphism*, modo oscuro y animaciones fluidas, operando 100% de manera local en tu navegador con almacenamiento en caché persistente.
 
-![Demo de la Aplicación](/home/jcast/.gemini/antigravity/brain/1c978d2e-7e23-4998-8a1a-f63c96fb4a09/.system_generated/click_feedback/click_feedback_1771714055988.png)
+## 📸 Galería
+
+| Dashboard Principal | Mini Hábito Completado |
+| :---: | :---: |
+| ![Dashboard Principal](docs/assets/dashboard.png) | ![Hábito Completado](docs/assets/completed.png) |
 
 ## ✨ Características Principales
 
