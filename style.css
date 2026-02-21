@@ -471,15 +471,17 @@ input[type="text"]:focus {
   .sidebar {
     width: 100%;
     height: auto;
-    flex-direction: row;
+    flex-direction: column;
     padding: 1rem;
     border-right: none;
     border-bottom: 1px solid var(--glass-border);
     align-items: center;
+    gap: 1rem;
   }
 
   .logo {
     margin-bottom: 0;
+    font-size: 1.25rem;
   }
 
   .nav-links {
@@ -488,15 +490,47 @@ input[type="text"]:focus {
 
   .actions-bottom {
     flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .actions-bottom .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    flex: 1;
   }
 
   .main-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .habits-container {
+    grid-template-columns: 1fr;
+  }
+
+  .habit-card {
+    padding: 1.25rem;
+  }
+
+  .modal {
+    width: 95%;
   }
 }
