@@ -1,0 +1,17 @@
+{
+    "name": "Mini Habits Suite",
+    "short_name": "MiniHabits",
+    "description": "Tu suite personal para mantener administrados tus mini hábitos de manera sencilla y hermosa.",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#8b5cf6",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "./icon.svg",
+            "sizes": "any",
+            "purpose": "any maskable"
+        }
+    ]
+}

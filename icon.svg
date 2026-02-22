@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Background shape -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGradient)" />
+  
+  <!-- Stack Layers icon -->
+  <g transform="translate(106, 116)" filter="url(#glow)">
+    <path d="M150 0 L300 70 L150 140 L0 70 Z" fill="url(#accentGradient)" opacity="0.9" />
+    <path d="M0 130 L150 200 L300 130 L150 60 Z" fill="url(#accentGradient)" opacity="0.6" />
+    <path d="M0 190 L150 260 L300 190 L150 120 Z" fill="url(#accentGradient)" opacity="0.3" />
+  </g>
+</svg>
