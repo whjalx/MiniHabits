@@ -893,54 +893,60 @@ input[type="text"]:focus {
     grid-template-columns: 1fr;
   }
 
-  /* Calendar Mobile Optimization */
+  /* Calendar Mobile Optimization Rebuild */
   .month-activity {
     max-width: 100%;
     padding: 1.5rem 1rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
+    /* Full width */
   }
 
   .month-activity .activity-header {
-    justify-content: center;
     width: 100%;
     margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
   }
 
   .month-activity .activity-header h2 {
     text-align: center;
-    width: 100%;
+    font-size: 1.4rem;
   }
 
   .calendar-wrapper {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     overflow-x: hidden;
+    /* Prevent ghost scrolls */
+    margin: 0;
     padding: 0;
   }
 
   .month-calendar-header,
   .month-calendar-grid {
-    gap: 6px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     width: 100%;
-    max-width: none;
+    gap: 4px;
+    /* Tighten gap for mobile */
     margin: 0 auto;
   }
 
   .calendar-day {
-    font-size: 0.9rem;
-    width: 100%;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    /* More compact */
   }
 
   .activity-legend {
     width: 100%;
-    display: flex;
     justify-content: center;
     margin-top: 1.5rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .habit-card,
