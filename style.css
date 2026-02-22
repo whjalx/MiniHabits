@@ -896,20 +896,46 @@ input[type="text"]:focus {
   /* Calendar Mobile Optimization */
   .month-activity {
     max-width: 100%;
-    padding: 1rem 0.75rem;
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .month-activity .activity-header {
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .month-activity .activity-header h2 {
+    text-align: center;
+    width: 100%;
+  }
+
+  .calendar-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
   }
 
   .month-calendar-header,
   .month-calendar-grid {
-    gap: 4px;
+    gap: 6px;
+    width: 100%;
+    max-width: 350px;
+    /* Small enough for most mobiles */
   }
 
   .calendar-day {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
-  .calendar-wrapper {
-    overflow-x: hidden;
+  .activity-legend {
+    width: 100%;
+    justify-content: center;
   }
 
   .habit-card,
