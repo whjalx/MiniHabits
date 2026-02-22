@@ -548,6 +548,14 @@ function saveRoutine() {
         return;
     }
 
+    const start = routineStartTime.value;
+    const end = routineEndTime.value;
+
+    if (start && end && end < start) {
+        alert("La hora de fin no puede ser anterior a la hora de inicio.");
+        return;
+    }
+
     const newRoutine = {
         id: generateId(),
         title: title,

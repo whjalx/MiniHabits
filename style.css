@@ -863,6 +863,25 @@ input[type="text"]:focus {
     grid-template-columns: 1fr;
   }
 
+  /* Calendar Mobile Optimization */
+  .month-activity {
+    max-width: 100%;
+    padding: 1rem 0.75rem;
+  }
+
+  .month-calendar-header,
+  .month-calendar-grid {
+    gap: 4px;
+  }
+
+  .calendar-day {
+    font-size: 0.85rem;
+  }
+
+  .calendar-wrapper {
+    overflow-x: hidden;
+  }
+
   .habit-card,
   .routine-card {
     padding: 1.25rem;
