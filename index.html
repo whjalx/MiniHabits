@@ -29,6 +29,7 @@
             </div>
             <ul class="nav-links">
                 <li class="active" data-tab="dashboard"><i class="fa-solid fa-house"></i> Dashboard</li>
+                <li data-tab="routines"><i class="fa-solid fa-stopwatch"></i> Rutinas</li>
                 <li data-tab="calendar"><i class="fa-solid fa-calendar"></i> Calendario</li>
             </ul>
             <div class="actions-bottom">
@@ -82,6 +83,14 @@
                     </div>
                 </div>
             </div>
+
+            <div id="routinesView" class="view-section hidden">
+                <div class="routines-grid">
+                    <div class="routines-container" id="routinesContainer">
+                        <!-- Dynamic Routines Content -->
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -113,6 +122,55 @@
             <div class="modal-footer">
                 <button class="btn cancel-btn close-modal">Cancelar</button>
                 <button id="saveHabitBtn" class="btn primary-btn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar Rutina -->
+    <div id="routineModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="routineModalTitle">Nueva Rutina</h2>
+                <button class="close-routine-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="routineName">Nombre de la Rutina</label>
+                    <input type="text" id="routineName" placeholder="Ej. Lectura intensiva" autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label>Días de la semana</label>
+                    <div class="routine-checkbox-group">
+                        <input type="checkbox" id="day-1" value="1"><label for="day-1">Lun</label>
+                        <input type="checkbox" id="day-2" value="2"><label for="day-2">Mar</label>
+                        <input type="checkbox" id="day-3" value="3"><label for="day-3">Mié</label>
+                        <input type="checkbox" id="day-4" value="4"><label for="day-4">Jue</label>
+                        <input type="checkbox" id="day-5" value="5"><label for="day-5">Vie</label>
+                        <input type="checkbox" id="day-6" value="6"><label for="day-6">Sáb</label>
+                        <input type="checkbox" id="day-0" value="0"><label for="day-0">Dom</label>
+                    </div>
+                </div>
+
+                <div class="form-group time-inputs">
+                    <div>
+                        <label for="routineStartTime">Hora inicio (Opcional)</label>
+                        <input type="time" id="routineStartTime">
+                    </div>
+                    <div>
+                        <label for="routineEndTime">Hora fin (Opcional)</label>
+                        <input type="time" id="routineEndTime">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="routineTimerGoal">Meta de tiempo (Cronómetro en minutos)</label>
+                    <input type="number" id="routineTimerGoal" placeholder="Ej. 30" min="1">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn cancel-btn close-routine-modal">Cancelar</button>
+                <button id="saveRoutineBtn" class="btn primary-btn">Guardar</button>
             </div>
         </div>
     </div>

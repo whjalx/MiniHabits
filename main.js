@@ -2,25 +2,36 @@
 
 // State
 let habits = [];
+let routines = [];
 let editingHabitId = null;
 let currentModalMiniHabits = [];
+let activeTimers = {};
 
 // DOM Elements
 const currentDateDisplay = document.getElementById('currentDateDisplay');
 const habitsContainer = document.getElementById('habitsContainer');
 const habitModal = document.getElementById('habitModal');
+const routineModal = document.getElementById('routineModal');
 const addHabitBtn = document.getElementById('addHabitBtn');
 const closeModalBtns = document.querySelectorAll('.close-modal');
+const closeRoutineModalBtns = document.querySelectorAll('.close-routine-modal');
 const saveHabitBtn = document.getElementById('saveHabitBtn');
 const habitNameInput = document.getElementById('habitName');
 const miniHabitInput = document.getElementById('miniHabitInput');
 const addMiniHabitBtn = document.getElementById('addMiniHabitBtn');
-const modalMiniHabitsList = document.getElementById('modalMiniHabitsList');
-const modalTitle = document.getElementById('modalTitle');
 const toastContainer = document.getElementById('toastContainer');
 const mainTitle = document.getElementById('mainTitle');
 const navLinks = document.querySelectorAll('.nav-links li');
 const views = document.querySelectorAll('.view-section');
+
+// Routine Modal elements
+const routineNameInput = document.getElementById('routineName');
+const routineDayCheckboxes = document.querySelectorAll('.routine-checkbox-group input[type="checkbox"]');
+const routineStartTime = document.getElementById('routineStartTime');
+const routineEndTime = document.getElementById('routineEndTime');
+const routineTimerGoal = document.getElementById('routineTimerGoal');
+const saveRoutineBtn = document.getElementById('saveRoutineBtn');
+const routinesContainer = document.getElementById('routinesContainer');
 
 const exportBtn = document.getElementById('exportBtn');
 const importBtnTrigger = document.getElementById('importBtnTrigger');
@@ -34,6 +45,7 @@ function init() {
 
     loadData();
     renderHabits();
+    renderRoutines();
     setupEventListeners();
 }
 
@@ -42,19 +54,27 @@ function loadData() {
     const data = localStorage.getItem('miniHabitsData');
     if (data) {
         try {
-            habits = JSON.parse(data);
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) {
+                habits = parsed;
+                routines = [];
+            } else {
+                habits = parsed.habits || [];
+                routines = parsed.routines || [];
+            }
         } catch (e) {
             console.error("Error parsing data", e);
             habits = [];
+            routines = [];
         }
     } else {
-        // Migration from old app or initialize empty
         habits = [];
+        routines = [];
     }
 }
 
 function saveData() {
-    localStorage.setItem('miniHabitsData', JSON.stringify(habits));
+    localStorage.setItem('miniHabitsData', JSON.stringify({ habits, routines }));
 }
 
 // UI Rendering
@@ -250,8 +270,19 @@ function switchTab(tabId, tabName) {
     if (tabId === 'calendar') {
         if (addHabitBtn) addHabitBtn.style.display = 'none';
         renderActivityCalendar();
+    } else if (tabId === 'routines') {
+        if (addHabitBtn) {
+            addHabitBtn.style.display = 'flex';
+            addHabitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Nueva Rutina';
+            addHabitBtn.onclick = openRoutineModal;
+        }
+        // renderRoutines(); // Assuming this function will be added later
     } else {
-        if (addHabitBtn) addHabitBtn.style.display = 'flex';
+        if (addHabitBtn) {
+            addHabitBtn.style.display = 'flex';
+            addHabitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Nuevo Hábito';
+            addHabitBtn.onclick = openModal;
+        }
     }
 }
 
@@ -323,6 +354,21 @@ function openModal() {
 
 function closeModal() {
     habitModal.classList.add('hidden');
+}
+
+function openRoutineModal() {
+    document.getElementById('routineModalTitle').textContent = "Nueva Rutina";
+    routineNameInput.value = '';
+    routineDayCheckboxes.forEach(cb => cb.checked = false);
+    routineStartTime.value = '';
+    routineEndTime.value = '';
+    routineTimerGoal.value = '';
+    routineModal.classList.remove('hidden');
+    routineNameInput.focus();
+}
+
+function closeRoutineModal() {
+    routineModal.classList.add('hidden');
 }
 
 function addDraftMiniHabit() {
