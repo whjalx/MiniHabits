@@ -335,18 +335,18 @@ function renderActivityCalendar() {
         cell.textContent = data.day;
 
         let bgColor = 'rgba(255, 255, 255, 0.05)';
-        let tooltipText = `${dateStr}: Sin hábitos`;
+        let tooltipText = `${dateStr}: Sin registros`;
 
         if (totalMiniHabits > 0) {
             const completed = Math.min(data.completed, totalMiniHabits);
             const ratio = completed / totalMiniHabits;
             if (completed > 0) {
                 const hue = Math.floor(ratio * 180);
-                bgColor = `hsl(${hue}, 80%, 50%)`;
+                bgColor = `hsl(${hue}, 75%, 40%)`;
                 tooltipText = `${dateStr}: ${completed} / ${totalMiniHabits} hábitos`;
             }
         } else if (data.completed > 0) {
-            bgColor = `hsl(180, 80%, 50%)`;
+            bgColor = `hsl(180, 75%, 40%)`;
             tooltipText = `${dateStr}: ${data.completed} hábitos`;
         }
 
@@ -360,21 +360,14 @@ function renderActivityCalendar() {
         calendarGrid.appendChild(cell);
     });
 
-    // Render Legend
+    // Render Legend — always show the full thermometer gradient
     legendContainer.innerHTML = '<span class="legend-text">Menos</span>';
-    if (totalMiniHabits > 0) {
-        for (let i = 0; i <= 4; i++) {
-            const ratio = i / 4;
-            const hue = Math.floor(ratio * 180);
-            const legendItem = document.createElement('div');
-            legendItem.className = 'legend-item';
-            legendItem.style.backgroundColor = `hsl(${hue}, 80%, 50%)`;
-            legendContainer.appendChild(legendItem);
-        }
-    } else {
+    for (let i = 0; i <= 4; i++) {
+        const ratio = i / 4;
+        const hue = Math.floor(ratio * 180);
         const legendItem = document.createElement('div');
         legendItem.className = 'legend-item';
-        legendItem.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        legendItem.style.backgroundColor = `hsl(${hue}, 75%, 40%)`;
         legendContainer.appendChild(legendItem);
     }
     legendContainer.insertAdjacentHTML('beforeend', '<span class="legend-text">Más</span>');
