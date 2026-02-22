@@ -130,14 +130,103 @@ function renderHabits() {
 }
 
 function renderRoutines() {
-    // Stub for now
     if (!routinesContainer) return;
-    routinesContainer.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 3rem;">
-            <i class="fa-solid fa-stopwatch" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-            <p>Sección de rutinas en desarrollo.</p>
-        </div>
-    `;
+
+    try {
+        routinesContainer.innerHTML = '';
+
+        if (!routines || routines.length === 0) {
+            routinesContainer.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 3rem;">
+                    <i class="fa-solid fa-stopwatch" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>No tienes ninguna rutina configurada. ¡Crea una para comenzar!</p>
+                </div>
+            `;
+            return;
+        }
+
+        const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+        routines.forEach(routine => {
+            const card = document.createElement('div');
+            card.className = 'routine-card';
+
+            // Defensive check for days
+            const days = Array.isArray(routine.days) ? routine.days : [];
+            const daysStr = days.map(d => dayNames[d] || '??').join(', ') || 'Sin días';
+
+            const timeStr = routine.startTime ? ` <i class="fa-solid fa-clock"></i> ${routine.startTime}${routine.endTime ? ' - ' + routine.endTime : ''}` : '';
+            const goalStr = routine.timerGoal ? ` <i class="fa-solid fa-bullseye"></i> ${routine.timerGoal} min` : '';
+
+            const elapsed = activeTimers[routine.id] ? activeTimers[routine.id].seconds : 0;
+            const displayTime = formatSeconds(elapsed);
+            const isRunning = activeTimers[routine.id] && activeTimers[routine.id].interval;
+
+            card.innerHTML = `
+                <div class="habit-header">
+                    <div class="habit-title">${escapeHTML(routine.title)}</div>
+                    <div class="habit-actions">
+                        <button onclick="window.deleteRoutine('${routine.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="routine-meta">
+                    <span><i class="fa-solid fa-calendar-days"></i> ${daysStr}</span>
+                    ${timeStr ? `<span>${timeStr}</span>` : ''}
+                    ${goalStr ? `<span>${goalStr}</span>` : ''}
+                </div>
+                <div class="timer-container">
+                    <div class="timer-display" id="timer-${routine.id}">${displayTime}</div>
+                    <button class="btn ${isRunning ? 'secondary-btn' : 'primary-btn'}" onclick="window.toggleTimer('${routine.id}')">
+                        <i class="fa-solid ${isRunning ? 'fa-pause' : 'fa-play'}"></i>
+                    </button>
+                </div>
+            `;
+            routinesContainer.appendChild(card);
+        });
+    } catch (error) {
+        console.error("Error in renderRoutines:", error);
+        routinesContainer.innerHTML = `<p style="color: var(--danger); text-align: center; padding: 2rem;">Error al cargar las rutinas. Revisa la consola.</p>`;
+    }
+}
+
+function formatSeconds(s) {
+    const mins = Math.floor(s / 60);
+    const secs = s % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function deleteRoutine(id) {
+    if (confirm('¿Seguro que deseas eliminar esta rutina?')) {
+        if (activeTimers[id] && activeTimers[id].interval) {
+            clearInterval(activeTimers[id].interval);
+        }
+        delete activeTimers[id];
+        routines = routines.filter(r => r.id !== id);
+        saveData();
+        renderRoutines();
+        showToast('Rutina eliminada');
+    }
+}
+
+function toggleTimer(id) {
+    if (!activeTimers[id]) {
+        activeTimers[id] = { seconds: 0, interval: null };
+    }
+
+    if (activeTimers[id].interval) {
+        clearInterval(activeTimers[id].interval);
+        activeTimers[id].interval = null;
+        renderRoutines();
+    } else {
+        activeTimers[id].interval = setInterval(() => {
+            activeTimers[id].seconds += 1;
+            const display = document.getElementById(`timer-${id}`);
+            if (display) {
+                display.textContent = formatSeconds(activeTimers[id].seconds);
+            }
+        }, 1000);
+        renderRoutines();
+    }
 }
 
 function renderActivityCalendar() {
@@ -395,13 +484,21 @@ function addDraftMiniHabit() {
     }
 }
 
-// Needed because it's called from inline HTML
+// Expose functions globally for onclick handlers
 window.removeDraftMiniHabit = function (id) {
     currentModalMiniHabits = currentModalMiniHabits.filter(mh => mh.id !== id);
     renderModalMiniHabits();
 }
 window.deleteHabit = deleteHabit;
 window.toggleMiniHabit = toggleMiniHabit;
+window.deleteRoutine = deleteRoutine;
+window.toggleTimer = toggleTimer;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.openRoutineModal = openRoutineModal;
+window.closeRoutineModal = closeRoutineModal;
+window.saveHabit = saveHabit;
+window.saveRoutine = saveRoutine;
 
 function saveHabit() {
     const title = habitNameInput.value.trim();
@@ -433,6 +530,39 @@ function saveHabit() {
     renderHabits();
     closeModal();
     showToast('Hábito guardado correctamente');
+}
+
+function saveRoutine() {
+    const title = routineNameInput.value.trim();
+    if (!title) {
+        alert("Por favor ingresa un nombre para la rutina.");
+        return;
+    }
+
+    const selectedDays = Array.from(routineDayCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => parseInt(cb.value));
+
+    if (selectedDays.length === 0) {
+        alert("Selecciona al menos un día.");
+        return;
+    }
+
+    const newRoutine = {
+        id: generateId(),
+        title: title,
+        days: selectedDays,
+        startTime: routineStartTime.value,
+        endTime: routineEndTime.value,
+        timerGoal: routineTimerGoal.value,
+        createdAt: new Date().toISOString()
+    };
+
+    routines.push(newRoutine);
+    saveData();
+    closeRoutineModal(); // Close first for better UX
+    renderRoutines();
+    showToast('Rutina guardada correctamente');
 }
 
 // Import & Export
@@ -546,6 +676,15 @@ function setupEventListeners() {
     });
 
     importInput.addEventListener('change', importData);
+
+
+    // Close on overlay click for routine modal
+    routineModal.addEventListener('click', (e) => {
+        if (e.target === routineModal) {
+            closeRoutineModal();
+        }
+    });
+
 }
 
 // Run app

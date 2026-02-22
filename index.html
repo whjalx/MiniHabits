@@ -131,7 +131,8 @@
         <div class="modal">
             <div class="modal-header">
                 <h2 id="routineModalTitle">Nueva Rutina</h2>
-                <button class="close-routine-modal"><i class="fa-solid fa-xmark"></i></button>
+                <button class="close-modal close-routine-modal" onclick="window.closeRoutineModal()"><i
+                        class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -169,8 +170,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn cancel-btn close-routine-modal">Cancelar</button>
-                <button id="saveRoutineBtn" class="btn primary-btn">Guardar</button>
+                <button class="btn cancel-btn close-routine-modal"
+                    onclick="window.closeRoutineModal()">Cancelar</button>
+                <button id="saveRoutineBtn" class="btn primary-btn" onclick="window.saveRoutine()">Guardar</button>
             </div>
         </div>
     </div>
