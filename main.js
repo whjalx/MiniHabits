@@ -93,7 +93,8 @@ function renderHabits() {
         return;
     }
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
     const activeHabits = [];
     const completedHabits = [];
@@ -435,7 +436,8 @@ function renderModalMiniHabits() {
 
 // Logic Actions
 function toggleMiniHabit(habitId, miniHabitId) {
-    const todayStr = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split('T')[0];
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
 
