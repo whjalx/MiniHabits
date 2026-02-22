@@ -129,6 +129,17 @@ function renderHabits() {
     });
 }
 
+function renderRoutines() {
+    // Stub for now
+    if (!routinesContainer) return;
+    routinesContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 3rem;">
+            <i class="fa-solid fa-stopwatch" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <p>Sección de rutinas en desarrollo.</p>
+        </div>
+    `;
+}
+
 function renderActivityCalendar() {
     const calendarGrid = document.getElementById('activityCalendarGrid');
     const legendContainer = document.getElementById('activityLegend');
@@ -274,15 +285,14 @@ function switchTab(tabId, tabName) {
         if (addHabitBtn) {
             addHabitBtn.style.display = 'flex';
             addHabitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Nueva Rutina';
-            addHabitBtn.onclick = openRoutineModal;
         }
-        // renderRoutines(); // Assuming this function will be added later
+        renderRoutines();
     } else {
         if (addHabitBtn) {
             addHabitBtn.style.display = 'flex';
             addHabitBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Nuevo Hábito';
-            addHabitBtn.onclick = openModal;
         }
+        renderHabits();
     }
 }
 
@@ -498,7 +508,14 @@ function setupEventListeners() {
         });
     });
 
-    addHabitBtn.addEventListener('click', openModal);
+    addHabitBtn.addEventListener('click', () => {
+        const activeTab = document.querySelector('.nav-links li.active').dataset.tab;
+        if (activeTab === 'routines') {
+            openRoutineModal();
+        } else {
+            openModal();
+        }
+    });
 
     closeModalBtns.forEach(btn => {
         btn.addEventListener('click', closeModal);
