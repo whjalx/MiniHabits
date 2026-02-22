@@ -40,8 +40,8 @@ const importInput = document.getElementById('importInput');
 // Init
 function init() {
     // Set Header Date
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    currentDateDisplay.textContent = new Date().toLocaleDateString('es-ES', options);
+    const options = { weekday: 'short', day: 'numeric', month: 'short' };
+    currentDateDisplay.textContent = new Date().toLocaleDateString('es-ES', options).replace('.', '');
 
     loadData();
     renderHabits();
@@ -364,7 +364,7 @@ function switchTab(tabId, tabName) {
     });
 
     if (mainTitle) {
-        mainTitle.textContent = tabName;
+        mainTitle.textContent = tabId === 'dashboard' ? 'Mi Día' : tabName;
     }
 
     if (tabId === 'calendar') {

@@ -828,14 +828,28 @@ input[type="text"]:focus {
   }
 
   header div {
-    width: 100%;
+    width: 65%;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   header h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+
+  header .subtitle {
+    font-size: 0.85rem;
+  }
+
+  #addHabitBtn {
+    width: auto;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
   }
 
   .btn {
