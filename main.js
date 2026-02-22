@@ -377,11 +377,6 @@ function renderActivityCalendar() {
     }
     legendContainer.insertAdjacentHTML('beforeend', '<span class="legend-text">Más</span>');
 
-    // Auto-scroll calendar right
-    const wrapper = document.querySelector('.calendar-wrapper');
-    if (wrapper) {
-        wrapper.scrollLeft = wrapper.scrollWidth;
-    }
 }
 
 function switchTab(tabId, tabName) {
