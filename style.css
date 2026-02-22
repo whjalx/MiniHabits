@@ -918,24 +918,29 @@ input[type="text"]:focus {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     overflow-x: hidden;
+    padding: 0;
   }
 
   .month-calendar-header,
   .month-calendar-grid {
     gap: 6px;
     width: 100%;
-    max-width: 350px;
-    /* Small enough for most mobiles */
+    max-width: none;
+    margin: 0 auto;
   }
 
   .calendar-day {
     font-size: 0.9rem;
+    width: 100%;
   }
 
   .activity-legend {
     width: 100%;
+    display: flex;
     justify-content: center;
+    margin-top: 1.5rem;
   }
 
   .habit-card,
