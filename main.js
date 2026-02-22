@@ -143,7 +143,8 @@ function createHabitCard(habit, todayStr, isCompletedSection = false) {
         <div class="habit-header">
             <div class="habit-title">${escapeHTML(habit.title)}</div>
             <div class="habit-actions">
-                <button onclick="deleteHabit('${habit.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                <button onclick="window.editHabit('${habit.id}')" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="window.deleteHabit('${habit.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
         <ul class="mini-habits-list">
@@ -486,6 +487,23 @@ function openModal() {
     habitNameInput.focus();
 }
 
+function editHabit(id) {
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
+
+    editingHabitId = id;
+    modalTitle.textContent = "Editar Hábito";
+    habitNameInput.value = habit.title;
+    miniHabitInput.value = '';
+
+    // Deep copy mini-habits to avoid direct modification before saving
+    currentModalMiniHabits = JSON.parse(JSON.stringify(habit.miniHabits));
+
+    renderModalMiniHabits();
+    habitModal.classList.remove('hidden');
+    habitNameInput.focus();
+}
+
 function closeModal() {
     habitModal.classList.add('hidden');
 }
@@ -525,6 +543,7 @@ window.removeDraftMiniHabit = function (id) {
     renderModalMiniHabits();
 }
 window.deleteHabit = deleteHabit;
+window.editHabit = editHabit;
 window.toggleMiniHabit = toggleMiniHabit;
 window.deleteRoutine = deleteRoutine;
 window.toggleTimer = toggleTimer;

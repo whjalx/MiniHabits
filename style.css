@@ -254,6 +254,14 @@ header .subtitle {
 }
 
 .habit-actions button:hover {
+  transform: scale(1.1);
+}
+
+.habit-actions button i.fa-pen-to-square:hover {
+  color: var(--accent-color);
+}
+
+.habit-actions button i.fa-trash:hover {
   color: var(--danger);
 }
 
