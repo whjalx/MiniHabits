@@ -741,6 +741,13 @@ function setupEventListeners() {
 
     importInput.addEventListener('change', importData);
 
+    // Mobile-only data action buttons
+    const mobileExportBtn = document.getElementById('mobileExportBtn');
+    const mobileImportBtn = document.getElementById('mobileImportBtn');
+    if (mobileExportBtn) mobileExportBtn.addEventListener('click', exportData);
+    if (mobileImportBtn) mobileImportBtn.addEventListener('click', () => importInput.click());
+
+
 
     // Close on overlay click for routine modal
     routineModal.addEventListener('click', (e) => {

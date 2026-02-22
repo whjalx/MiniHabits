@@ -46,9 +46,20 @@
         <!-- Main Content -->
         <main class="main-content">
             <header>
-                <div>
-                    <h1 id="mainTitle">Mi Día</h1>
-                    <p class="subtitle" id="currentDateDisplay">Fecha de hoy</p>
+                <div class="header-top">
+                    <div class="header-title">
+                        <h1 id="mainTitle">Mi Día</h1>
+                        <p class="subtitle" id="currentDateDisplay">Fecha de hoy</p>
+                    </div>
+                    <!-- Mobile-only import/export buttons -->
+                    <div class="mobile-data-actions">
+                        <button id="mobileExportBtn" class="icon-action-btn" title="Exportar Datos">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <button id="mobileImportBtn" class="icon-action-btn" title="Importar Datos">
+                            <i class="fa-solid fa-upload"></i>
+                        </button>
+                    </div>
                 </div>
                 <!-- Action button dynamically hidden/shown based on tab -->
                 <button id="addHabitBtn" class="btn primary-btn">
