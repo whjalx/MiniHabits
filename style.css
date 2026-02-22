@@ -204,6 +204,32 @@ header .subtitle {
   transform: translateY(-4px);
 }
 
+.completed-card {
+  opacity: 0.7;
+  filter: grayscale(0.5);
+}
+
+.completed-section-header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: var(--transition);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.completed-section-header:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
 .habit-header {
   display: flex;
   justify-content: space-between;
@@ -608,9 +634,13 @@ input[type="text"]:focus {
 .activity-legend {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
   font-size: 0.85rem;
   color: var(--text-secondary);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
 }
 
 .legend-text {

@@ -6,6 +6,7 @@ let routines = [];
 let editingHabitId = null;
 let currentModalMiniHabits = [];
 let activeTimers = {};
+let completedSectionExpanded = false;
 
 // DOM Elements
 const currentDateDisplay = document.getElementById('currentDateDisplay');
@@ -94,39 +95,78 @@ function renderHabits() {
 
     const todayStr = new Date().toISOString().split('T')[0];
 
+    const activeHabits = [];
+    const completedHabits = [];
+
     habits.forEach(habit => {
-        const card = document.createElement('div');
-        card.className = 'habit-card';
-
-        // Calculate progress for today
         const total = habit.miniHabits.length;
-        const completed = habit.miniHabits.filter(mh => mh.completedDates && mh.completedDates.includes(todayStr)).length;
-        const progressPercent = total === 0 ? 0 : (completed / total) * 100;
+        const completedCount = habit.miniHabits.filter(mh => mh.completedDates && mh.completedDates.includes(todayStr)).length;
+        const isFullyCompleted = total > 0 && total === completedCount;
 
-        card.innerHTML = `
-            <div class="habit-header">
-                <div class="habit-title">${escapeHTML(habit.title)}</div>
-                <div class="habit-actions">
-                    <button onclick="deleteHabit('${habit.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            </div>
-            <ul class="mini-habits-list">
-                ${habit.miniHabits.map(mh => {
-            const isCompleted = mh.completedDates && mh.completedDates.includes(todayStr);
-            return `
-                    <li class="mini-habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleMiniHabit('${habit.id}', '${mh.id}')">
-                        <div class="checkbox"></div>
-                        <span>${escapeHTML(mh.title)}</span>
-                    </li>
-                    `;
-        }).join('')}
-            </ul>
-            <div class="progress-bar-container">
-                <div class="progress-bar" style="width: ${progressPercent}%"></div>
-            </div>
-        `;
-        habitsContainer.appendChild(card);
+        if (isFullyCompleted) {
+            completedHabits.push({ ...habit, progressPercent: 100 });
+        } else {
+            const progressPercent = total === 0 ? 0 : (completedCount / total) * 100;
+            activeHabits.push({ ...habit, progressPercent });
+        }
     });
+
+    // Render Active Habits
+    activeHabits.forEach(habit => {
+        habitsContainer.appendChild(createHabitCard(habit, todayStr));
+    });
+
+    // Render Completed Habits Section
+    if (completedHabits.length > 0) {
+        const sectionHeader = document.createElement('div');
+        sectionHeader.className = 'completed-section-header';
+        sectionHeader.onclick = toggleCompletedSection;
+        sectionHeader.innerHTML = `
+            <span>Realizados (${completedHabits.length})</span>
+            <i class="fa-solid fa-chevron-${completedSectionExpanded ? 'up' : 'down'}"></i>
+        `;
+        habitsContainer.appendChild(sectionHeader);
+
+        if (completedSectionExpanded) {
+            completedHabits.forEach(habit => {
+                habitsContainer.appendChild(createHabitCard(habit, todayStr, true));
+            });
+        }
+    }
+}
+
+function createHabitCard(habit, todayStr, isCompletedSection = false) {
+    const card = document.createElement('div');
+    card.className = `habit-card ${isCompletedSection ? 'completed-card' : ''}`;
+
+    card.innerHTML = `
+        <div class="habit-header">
+            <div class="habit-title">${escapeHTML(habit.title)}</div>
+            <div class="habit-actions">
+                <button onclick="deleteHabit('${habit.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </div>
+        <ul class="mini-habits-list">
+            ${habit.miniHabits.map(mh => {
+        const isCompleted = mh.completedDates && mh.completedDates.includes(todayStr);
+        return `
+                <li class="mini-habit-item ${isCompleted ? 'completed' : ''}" onclick="toggleMiniHabit('${habit.id}', '${mh.id}')">
+                    <div class="checkbox"></div>
+                    <span>${escapeHTML(mh.title)}</span>
+                </li>
+                `;
+    }).join('')}
+        </ul>
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: ${habit.progressPercent}%"></div>
+        </div>
+    `;
+    return card;
+}
+
+function toggleCompletedSection() {
+    completedSectionExpanded = !completedSectionExpanded;
+    renderHabits();
 }
 
 function renderRoutines() {
