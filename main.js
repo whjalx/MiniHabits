@@ -18,6 +18,9 @@ const addMiniHabitBtn = document.getElementById('addMiniHabitBtn');
 const modalMiniHabitsList = document.getElementById('modalMiniHabitsList');
 const modalTitle = document.getElementById('modalTitle');
 const toastContainer = document.getElementById('toastContainer');
+const mainTitle = document.getElementById('mainTitle');
+const navLinks = document.querySelectorAll('.nav-links li');
+const views = document.querySelectorAll('.view-section');
 
 const exportBtn = document.getElementById('exportBtn');
 const importBtnTrigger = document.getElementById('importBtnTrigger');
@@ -56,6 +59,7 @@ function saveData() {
 
 // UI Rendering
 function renderHabits() {
+    renderActivityCalendar();
     habitsContainer.innerHTML = '';
 
     if (habits.length === 0) {
@@ -103,6 +107,152 @@ function renderHabits() {
         `;
         habitsContainer.appendChild(card);
     });
+}
+
+function renderActivityCalendar() {
+    const calendarGrid = document.getElementById('activityCalendarGrid');
+    const legendContainer = document.getElementById('activityLegend');
+    if (!calendarGrid || !legendContainer) return;
+
+    // Calculate total mini habits right now to define the maximum scale
+    let totalMiniHabits = 0;
+    habits.forEach(h => {
+        totalMiniHabits += h.miniHabits.length;
+    });
+
+    // Show current month
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+
+    // JS getDay(): 0 is Sunday. We want 0=Monday, 6=Sunday
+    let startDayOfWeek = firstDay.getDay() - 1;
+    if (startDayOfWeek === -1) startDayOfWeek = 6;
+
+    // Generate dates map for the month
+    const datesMap = new Map();
+    for (let i = 1; i <= daysInMonth; i++) {
+        const d = new Date(year, month, i);
+        const offset = d.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(d.getTime() - offset)).toISOString().split('T')[0];
+        datesMap.set(localISOTime, { completed: 0, dateObj: d, day: i });
+    }
+
+    // Accumulate completions
+    habits.forEach(habit => {
+        habit.miniHabits.forEach(mh => {
+            if (mh.completedDates) {
+                mh.completedDates.forEach(dStr => {
+                    if (datesMap.has(dStr)) {
+                        const data = datesMap.get(dStr);
+                        data.completed += 1;
+                    }
+                });
+            }
+        });
+    });
+
+    // Render cells
+    calendarGrid.innerHTML = '';
+
+    for (let i = 0; i < startDayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'calendar-day empty';
+        calendarGrid.appendChild(emptyCell);
+    }
+
+    const todayLocalISO = (new Date(today.getTime() - today.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
+    datesMap.forEach((data, dateStr) => {
+        const cell = document.createElement('div');
+        cell.className = 'calendar-day';
+        cell.textContent = data.day;
+
+        let bgColor = 'rgba(255, 255, 255, 0.05)';
+        let tooltipText = `${dateStr}: Sin hábitos`;
+
+        if (totalMiniHabits > 0) {
+            const completed = Math.min(data.completed, totalMiniHabits);
+            const ratio = completed / totalMiniHabits;
+            if (completed > 0) {
+                const hue = Math.floor(ratio * 180);
+                bgColor = `hsl(${hue}, 80%, 50%)`;
+                tooltipText = `${dateStr}: ${completed} / ${totalMiniHabits} hábitos`;
+            }
+        } else if (data.completed > 0) {
+            bgColor = `hsl(180, 80%, 50%)`;
+            tooltipText = `${dateStr}: ${data.completed} hábitos`;
+        }
+
+        cell.style.backgroundColor = bgColor;
+        cell.setAttribute('data-tooltip', tooltipText);
+
+        if (dateStr === todayLocalISO) {
+            cell.style.border = '2px solid white';
+        }
+
+        calendarGrid.appendChild(cell);
+    });
+
+    // Render Legend
+    legendContainer.innerHTML = '<span class="legend-text">Menos</span>';
+    if (totalMiniHabits > 0) {
+        for (let i = 0; i <= 4; i++) {
+            const ratio = i / 4;
+            const hue = Math.floor(ratio * 180);
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            legendItem.style.backgroundColor = `hsl(${hue}, 80%, 50%)`;
+            legendContainer.appendChild(legendItem);
+        }
+    } else {
+        const legendItem = document.createElement('div');
+        legendItem.className = 'legend-item';
+        legendItem.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        legendContainer.appendChild(legendItem);
+    }
+    legendContainer.insertAdjacentHTML('beforeend', '<span class="legend-text">Más</span>');
+
+    // Auto-scroll calendar right
+    const wrapper = document.querySelector('.calendar-wrapper');
+    if (wrapper) {
+        wrapper.scrollLeft = wrapper.scrollWidth;
+    }
+}
+
+function switchTab(tabId, tabName) {
+    navLinks.forEach(link => {
+        if (link.dataset.tab === tabId) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+
+    views.forEach(view => {
+        if (view.id === `${tabId}View`) {
+            view.classList.remove('hidden');
+            view.classList.add('active');
+        } else {
+            view.classList.add('hidden');
+            view.classList.remove('active');
+        }
+    });
+
+    if (mainTitle) {
+        mainTitle.textContent = tabName;
+    }
+
+    if (tabId === 'calendar') {
+        if (addHabitBtn) addHabitBtn.style.display = 'none';
+        renderActivityCalendar();
+    } else {
+        if (addHabitBtn) addHabitBtn.style.display = 'flex';
+    }
 }
 
 function renderModalMiniHabits() {
@@ -295,6 +445,13 @@ function showToast(message) {
 
 // Event Listeners
 function setupEventListeners() {
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const tabName = link.textContent.trim();
+            switchTab(link.dataset.tab, tabName);
+        });
+    });
+
     addHabitBtn.addEventListener('click', openModal);
 
     closeModalBtns.forEach(btn => {

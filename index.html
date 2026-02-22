@@ -29,6 +29,7 @@
             </div>
             <ul class="nav-links">
                 <li class="active" data-tab="dashboard"><i class="fa-solid fa-house"></i> Dashboard</li>
+                <li data-tab="calendar"><i class="fa-solid fa-calendar"></i> Calendario</li>
             </ul>
             <div class="actions-bottom">
                 <button id="exportBtn" class="btn secondary-btn" title="Exportar Datos">
@@ -45,18 +46,40 @@
         <main class="main-content">
             <header>
                 <div>
-                    <h1>Mi Día</h1>
+                    <h1 id="mainTitle">Mi Día</h1>
                     <p class="subtitle" id="currentDateDisplay">Fecha de hoy</p>
                 </div>
+                <!-- Action button dynamically hidden/shown based on tab -->
                 <button id="addHabitBtn" class="btn primary-btn">
                     <i class="fa-solid fa-plus"></i> Nuevo Hábito
                 </button>
             </header>
 
-            <div class="dashboard-grid">
-                <!-- Habit cards will be injected here -->
-                <div class="habits-container" id="habitsContainer">
-                    <!-- Dynamic Content -->
+            <div id="dashboardView" class="view-section active">
+                <div class="dashboard-grid">
+                    <!-- Habit cards will be injected here -->
+                    <div class="habits-container" id="habitsContainer">
+                        <!-- Dynamic Content -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendarView" class="view-section hidden">
+                <div class="activity-section month-activity">
+                    <div class="activity-header">
+                        <h2>Resumen Mensual</h2>
+                        <div class="activity-legend" id="activityLegend">
+                            <!-- Legend will be dynamically generated -->
+                        </div>
+                    </div>
+                    <div class="calendar-wrapper">
+                        <div class="month-calendar-header">
+                            <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+                        </div>
+                        <div class="month-calendar-grid" id="activityCalendarGrid">
+                            <!-- Cells will be generated here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
