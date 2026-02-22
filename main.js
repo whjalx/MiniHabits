@@ -38,6 +38,9 @@ const exportBtn = document.getElementById('exportBtn');
 const importBtnTrigger = document.getElementById('importBtnTrigger');
 const importInput = document.getElementById('importInput');
 
+// Notification schedule for habits: every 2 hours from 7AM to 11PM
+const HABIT_NOTIFICATION_HOURS = [7, 9, 11, 13, 15, 17, 19, 21, 23];
+
 // Init
 function init() {
     // Set Header Date
@@ -48,6 +51,8 @@ function init() {
     renderHabits();
     renderRoutines();
     setupEventListeners();
+    requestNotificationPermission();
+    startNotificationScheduler();
 }
 
 // Data Management
@@ -76,6 +81,87 @@ function loadData() {
 
 function saveData() {
     localStorage.setItem('miniHabitsData', JSON.stringify({ habits, routines }));
+}
+
+// Notifications
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+}
+
+function sendNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+            body,
+            icon: 'icon.svg',
+            badge: 'icon.svg'
+        });
+    }
+}
+
+function startNotificationScheduler() {
+    // Check immediately then every minute
+    checkScheduledNotifications();
+    setInterval(checkScheduledNotifications, 60000);
+}
+
+function checkScheduledNotifications() {
+    const now = new Date();
+    const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    const todayStr = localNow.toISOString().split('T')[0];
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+
+    // Habit notifications: fire at minute 0 of each scheduled hour
+    if (currentMinute === 0 && HABIT_NOTIFICATION_HOURS.includes(currentHour)) {
+        habits.forEach(habit => {
+            if (habit.notificationsEnabled === false) return;
+            const total = habit.miniHabits.length;
+            const completed = habit.miniHabits.filter(mh =>
+                mh.completedDates && mh.completedDates.includes(todayStr)
+            ).length;
+            if (total > 0 && completed < total) {
+                sendNotification(
+                    `⏰ Recuerda: ${habit.title}`,
+                    `Tienes ${total - completed} mini hábito(s) pendientes hoy.`
+                );
+            }
+        });
+    }
+
+    // Routine notifications: fire at user-specified time
+    routines.forEach(routine => {
+        if (!routine.notificationTime) return;
+        const [rHour, rMinute] = routine.notificationTime.split(':').map(Number);
+        if (currentHour === rHour && currentMinute === rMinute) {
+            sendNotification(
+                `⏰ Rutina: ${routine.title}`,
+                '\u00a1Es hora de tu rutina!'
+            );
+        }
+    });
+}
+
+function toggleHabitNotification(id) {
+    const habit = habits.find(h => h.id === id);
+    if (!habit) return;
+    habit.notificationsEnabled = habit.notificationsEnabled === false ? true : false;
+    saveData();
+    renderHabits();
+    if (habit.notificationsEnabled !== false) {
+        showToast(`🔔 Notificaciones activadas para "${habit.title}"`);
+    } else {
+        showToast(`🔕 Notificaciones desactivadas`);
+    }
+}
+
+function setRoutineNotificationTime(id, time) {
+    const routine = routines.find(r => r.id === id);
+    if (!routine) return;
+    routine.notificationTime = time;
+    saveData();
+    if (time) showToast(`🔔 Aviso configurado a las ${time}`);
 }
 
 // UI Rendering
@@ -139,6 +225,7 @@ function renderHabits() {
 function createHabitCard(habit, todayStr, isCompletedSection = false) {
     const card = document.createElement('div');
     card.className = `habit-card ${isCompletedSection ? 'completed-card' : ''}`;
+    const notifEnabled = habit.notificationsEnabled !== false;
 
     card.innerHTML = `
         <div class="habit-header">
@@ -161,6 +248,12 @@ function createHabitCard(habit, todayStr, isCompletedSection = false) {
         </ul>
         <div class="progress-bar-container">
             <div class="progress-bar" style="width: ${habit.progressPercent}%"></div>
+        </div>
+        <div class="notification-row">
+            <button class="notif-toggle-btn ${notifEnabled ? 'notif-on' : 'notif-off'}" onclick="window.toggleHabitNotification('${habit.id}')" title="${notifEnabled ? 'Desactivar avisos' : 'Activar avisos'}">
+                <i class="fa-solid ${notifEnabled ? 'fa-bell' : 'fa-bell-slash'}"></i>
+                <span>${notifEnabled ? 'Avisos cada 2h (7AM–11PM)' : 'Avisos desactivados'}</span>
+            </button>
         </div>
     `;
     return card;
@@ -221,6 +314,10 @@ function renderRoutines() {
                     <button class="btn ${isRunning ? 'secondary-btn' : 'primary-btn'}" onclick="window.toggleTimer('${routine.id}')">
                         <i class="fa-solid ${isRunning ? 'fa-pause' : 'fa-play'}"></i>
                     </button>
+                </div>
+                <div class="notification-row">
+                    <label class="notif-time-label"><i class="fa-solid fa-bell"></i> Avisarme a las:</label>
+                    <input type="time" class="notif-time-input" value="${routine.notificationTime || ''}" onchange="window.setRoutineNotificationTime('${routine.id}', this.value)" />
                 </div>
             `;
             routinesContainer.appendChild(card);
@@ -539,6 +636,8 @@ window.removeDraftMiniHabit = function (id) {
 }
 window.deleteHabit = deleteHabit;
 window.editHabit = editHabit;
+window.toggleHabitNotification = toggleHabitNotification;
+window.setRoutineNotificationTime = setRoutineNotificationTime;
 window.toggleMiniHabit = toggleMiniHabit;
 window.deleteRoutine = deleteRoutine;
 window.toggleTimer = toggleTimer;

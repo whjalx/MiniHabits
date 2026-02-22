@@ -357,6 +357,74 @@ header .subtitle {
   transition: width 0.5s ease-in-out;
 }
 
+/* Notification Controls */
+.notification-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--glass-border);
+  flex-wrap: wrap;
+}
+
+.notif-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: 1;
+}
+
+.notif-toggle-btn.notif-on {
+  color: var(--success);
+  border-color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.notif-toggle-btn.notif-off {
+  color: var(--text-secondary);
+}
+
+.notif-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.notif-time-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.notif-time-label i {
+  color: var(--accent-color);
+}
+
+.notif-time-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.4rem;
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  width: auto;
+  flex: 1;
+}
+
+.notif-time-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
 /* Routines Tab Specific Styles */
 .routines-container {
   display: grid;
