@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_c5fb12a24dfa47ebd122dba3ae5c2ba1 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
+</head>
+<body>
+    
+    
+    <!-- Conectamos la enorme BD de clientes desde un archivo que no bloquea la RAM de Python -->
+    <script src="datos_mapa_clientes_unicos_central_bd_ordenes.js"></script>
+    
+    <div id="custom-search-container" style="position: absolute; top: 10px; right: 50px; z-index: 9999; background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 15px rgba(0,0,0,0.2); width: 320px; max-height: 80vh; display: flex; flex-direction: column; font-family: Arial, sans-serif;">
+        <input type="text" id="custom-search-input" placeholder="Buscar orden, cliente, tel, dir..." style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;">
+        <div id="custom-search-results" style="overflow-y: auto; flex-grow: 1;"></div>
+    </div>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+            var myMap = null;
+            for (var key in window) {
+                if (key.startsWith("map_") && window[key] instanceof L.Map) {
+                    myMap = window[key];
+                    break;
+                }
+            }
+            if (!myMap) return;
+
+            var container = document.getElementById('custom-search-container');
+            myMap.getContainer().appendChild(container);
+
+            var data = window.mapData || [];
+            if (data.length === 0) return;
+            
+            // Pantalla de carga para prevenir crashes cuando el DOM procesa miles de casas
+            var loadingDiv = document.createElement('div');
+            loadingDiv.innerHTML = "<div style='text-align:center;'>Generando mapa inmenso (" + data.length + " pines)...<br><br><div style='font-size:30px;font-weight:bold;'><span id='load-progress'>0</span>%</div></div>";
+            loadingDiv.style.cssText = "position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:9999; background:rgba(0,0,0,0.85); color:white; padding:40px; border-radius:15px; font-family:sans-serif; box-shadow:0 0 20px rgba(0,0,0,0.5);";
+            document.body.appendChild(loadingDiv);
+
+            var cluster = L.markerClusterGroup({
+                chunkedLoading: true,
+                chunkProgress: function (processed, total, elapsed, layersArray) {
+                    var progress = Math.round((processed / total) * 100);
+                    var el = document.getElementById('load-progress');
+                    if (el) el.innerText = Math.round(50 + (progress / 2));
+                }
+            });
+
+            var searchInput = document.getElementById('custom-search-input');
+            var resultsDiv = document.getElementById('custom-search-results');
+
+            // Renderizado en lotes (5000 pines por microsegundo) para dejar el navegador respirar
+            var i = 0;
+            var chunkSize = 5000;
+            var markers = [];
+
+            function processChunk() {
+                var end = Math.min(i + chunkSize, data.length);
+                for (; i < end; i++) {
+                    var m = data[i];
+                    var marker = L.marker([m.lat, m.lon]);
+                    marker.bindPopup(m.html);
+                    markers.push(marker);
+                }
+                
+                var el = document.getElementById('load-progress');
+                if (el) el.innerText = Math.round((i / data.length) * 50);
+
+                if (i < data.length) {
+                    setTimeout(processChunk, 15);
+                } else {
+                    if (el) el.innerText = "50 (Agrupando...)";
+                    setTimeout(function() {
+                        // El algoritmo super de C++ interno agrupa los 150,000 pines aquí
+                        cluster.addLayers(markers);
+                        myMap.addLayer(cluster);
+                        if (document.body.contains(loadingDiv)) {
+                            document.body.removeChild(loadingDiv);
+                        }
+                    }, 100);
+                }
+            }
+            processChunk();
+
+            function renderResults(query) {
+                resultsDiv.innerHTML = '';
+                if (!query) return;
+                var q = query.toLowerCase();
+                
+                var matches = data.filter(function(m) {
+                    return (m.order && m.order.toLowerCase().includes(q)) || 
+                           (m.name && m.name.toLowerCase().includes(q)) || 
+                           (m.phone && m.phone.toLowerCase().includes(q)) || 
+                           (m.address && m.address.toLowerCase().includes(q));
+                }).slice(0, 50);
+
+                if (matches.length === 0) {
+                     resultsDiv.innerHTML = '<div style="padding: 8px; font-size: 13px; color: #888;">No hay resultados</div>';
+                     return;
+                }
+
+                matches.forEach(function(m) {
+                    var div = document.createElement('div');
+                    div.style.cssText = 'padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px; background: white; transition: background 0.2s;';
+                    div.innerHTML = "<strong>" + (m.order ? "Orden " + m.order : "Cliente Frecuente") + "</strong><br><span style='color:#666;font-size:11px'>" + m.name + " (" + m.phone + ")</span>";
+                    
+                    div.onmouseover = function() { this.style.backgroundColor = '#f5f5f5'; };
+                    div.onmouseout = function() { this.style.backgroundColor = 'white'; };
+                    div.onclick = function() {
+                        myMap.flyTo([m.lat, m.lon], 18);
+                        L.popup().setLatLng([m.lat, m.lon]).setContent(m.html).openOn(myMap);
+                    };
+                    resultsDiv.appendChild(div);
+                });
+            }
+
+            searchInput.addEventListener('input', function(e) {
+                renderResults(e.target.value);
+            });
+        }, 800);
+    });
+    </script>
+    
+    
+            <div class="folium-map" id="map_c5fb12a24dfa47ebd122dba3ae5c2ba1" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_c5fb12a24dfa47ebd122dba3ae5c2ba1 = L.map(
+                "map_c5fb12a24dfa47ebd122dba3ae5c2ba1",
+                {
+                    center: [23.6345, -102.5528],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 5,
+                    zoomControl: true,
+                    preferCanvas: true,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_35d92bf38c98558eddc750e5c038141c = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+        
+    
+            tile_layer_35d92bf38c98558eddc750e5c038141c.addTo(map_c5fb12a24dfa47ebd122dba3ae5c2ba1);
+        
+    
+            var marker_cluster_83f27322ab107c788a8375776540f907 = L.markerClusterGroup(
+                {}
+            );
+        
+    
+            marker_cluster_83f27322ab107c788a8375776540f907.addTo(map_c5fb12a24dfa47ebd122dba3ae5c2ba1);
+        
+</script>
+</html>
